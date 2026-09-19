@@ -81,9 +81,14 @@ const UserProfile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogout = () => {
-    logoutUser();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch {
+      // Redux still clears the local session when the backend is unreachable.
+    } finally {
+      navigate('/login');
+    }
   };
 
   const handleDeleteAccount = async () => {

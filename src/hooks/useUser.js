@@ -7,7 +7,7 @@ import {
   getMyProfile,
   getUserProfile,
   loginUser,
-  logoutUserAction,
+  logoutUser,
   registerUser,
   resetPassword,
   verifyPasswordReset,
@@ -46,7 +46,7 @@ export const useUser = () => {
     [dispatch]
   );
 
-  const logoutUserFn = useCallback(() => dispatch(logoutUserAction()), [dispatch]);
+  const logoutUserFn = useCallback(() => dispatch(logoutUser()).unwrap(), [dispatch]);
 
   const forgotPasswordFn = useCallback(
     phone => dispatch(forgotPassword({ phone })).unwrap(),
