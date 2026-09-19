@@ -14,6 +14,7 @@ const mockClearUserError = vi.fn();
 const mockRegisterUser = vi.fn();
 const mockVerifyRegistration = vi.fn();
 const mockLoginUser = vi.fn();
+const mockLogoutUser = vi.fn();
 const mockLogoutUserAction = vi.fn();
 const mockForgotPassword = vi.fn();
 const mockVerifyPasswordReset = vi.fn();
@@ -28,6 +29,7 @@ vi.mock('../../store/slices/userSlice', () => ({
   registerUser: (...args) => mockRegisterUser(...args),
   verifyRegistration: (...args) => mockVerifyRegistration(...args),
   loginUser: (...args) => mockLoginUser(...args),
+  logoutUser: (...args) => mockLogoutUser(...args),
   logoutUserAction: (...args) => mockLogoutUserAction(...args),
   forgotPassword: (...args) => mockForgotPassword(...args),
   verifyPasswordReset: (...args) => mockVerifyPasswordReset(...args),
@@ -97,7 +99,7 @@ describe('useUser', () => {
     mockVerifyPasswordReset.mockReturnValue({ type: 'user/verifyPasswordReset' });
     mockResetPassword.mockReturnValue({ type: 'user/resetPassword' });
     mockVerifyRegistration.mockReturnValue({ type: 'user/verifyRegistration' });
-    mockLogoutUserAction.mockReturnValue({ type: 'user/logoutUserAction' });
+    mockLogoutUser.mockReturnValue({ type: 'user/logoutUser' });
     mockClearUserError.mockReturnValue({ type: 'user/clearUserError' });
 
     const { result } = renderHook(() => useUser());
@@ -111,7 +113,7 @@ describe('useUser', () => {
       await result.current.verifyPasswordReset('0771234567', '1234');
       await result.current.resetPassword('0771234567', 'token', 'newPass123');
       await result.current.verifyRegistration('0771234567', '1234');
-      result.current.logoutUser();
+      await result.current.logoutUser();
       result.current.clearError();
     });
 
@@ -127,7 +129,7 @@ describe('useUser', () => {
       password: 'newPass123',
     });
     expect(mockVerifyRegistration).toHaveBeenCalledWith({ phone: '0771234567', otp: '1234' });
-    expect(mockLogoutUserAction).toHaveBeenCalledWith();
+    expect(mockLogoutUser).toHaveBeenCalledWith();
     expect(mockClearUserError).toHaveBeenCalledWith();
   });
 

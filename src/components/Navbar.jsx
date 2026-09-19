@@ -200,9 +200,14 @@ const Navbar = () => {
   const isAdminSection = location.pathname.startsWith('/admin');
   const showEmployerNav = currentUser?.role === 'employer' && !isAuthPage && !isAdminSection;
 
-  const handleLogout = () => {
-    logoutUser();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch {
+      // Redux still clears the local session when the backend is unreachable.
+    } finally {
+      navigate('/login');
+    }
   };
 
   const navLinkClass = active =>

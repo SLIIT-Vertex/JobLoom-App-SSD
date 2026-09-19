@@ -3,6 +3,12 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
+const clearStoredSession = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('session_expiry');
+};
+
 const loadStoredUser = () => {
   try {
     const expiry = localStorage.getItem('session_expiry');
@@ -120,6 +126,29 @@ export const loginUser = createAsyncThunk(
       return { data, token, user };
     } catch (err) {
       return rejectWithValue(err?.message || 'Login failed');
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'user/logout',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const token = getState()?.user?.token || loadStoredToken();
+      const response = await fetch(`${API_URL}/users/logout`, {
+        method: 'POST',
+        headers: authHeaders(token),
+      });
+      const data = await response.json();
+
+      // A 401 means the session is already unusable, so local logout is still complete.
+      if (!response.ok && response.status !== 401) {
+        return rejectWithValue(toErrorMessage(data) || 'Logout failed');
+      }
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(err?.message || 'Logout failed');
     }
   }
 );
@@ -281,10 +310,8 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    logoutUser(state) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('session_expiry');
+    clearSession(state) {
+      clearStoredSession();
       state.currentUser = null;
       state.token = null;
       state.error = null;
@@ -324,6 +351,20 @@ const userSlice = createSlice({
         state.currentUser = action.payload?.user || state.currentUser;
       })
       .addCase(loginUser.rejected, setRejected)
+      .addCase(logoutUser.pending, setPending)
+      .addCase(logoutUser.fulfilled, state => {
+        clearStoredSession();
+        state.currentUser = null;
+        state.token = null;
+        state.loading = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        clearStoredSession();
+        state.currentUser = null;
+        state.token = null;
+        state.loading = false;
+        state.error = action.payload || action.error?.message || 'Logout failed';
+      })
       .addCase(forgotPassword.pending, setPending)
       .addCase(forgotPassword.fulfilled, state => {
         state.loading = false;
@@ -374,5 +415,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { logoutUser: logoutUserAction, clearUserError } = userSlice.actions;
+export const { clearSession: logoutUserAction, clearUserError } = userSlice.actions;
 export default userSlice.reducer;
