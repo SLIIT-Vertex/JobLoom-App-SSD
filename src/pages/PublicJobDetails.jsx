@@ -10,6 +10,7 @@ import {
   selectAppliedJobIdsLoaded,
 } from '../store/slices/applicationSlice';
 import parse from 'html-react-parser';
+import { sanitizeJobDescription } from '../utils/sanitizeJobDescription';
 
 import DottedBackground from '../components/DottedBackground';
 import ApplyModal from '../components/applications/ApplyModal';
@@ -332,7 +333,9 @@ const PublicJobDetails = () => {
           </div>
           <div className="border-t border-neutral-100 pt-4 overflow-x-auto">
             <div className="prose prose-sm sm:prose-lg max-w-none text-muted leading-relaxed [&_img]:max-w-full [&_pre]:max-w-full [&_table]:block [&_table]:overflow-x-auto sm:[&_table]:table">
-              {parse(job.description || t('job.no_description'))}
+              {parse(
+                sanitizeJobDescription(job.description) || t('job.no_description')
+              )}
             </div>
           </div>
         </div>

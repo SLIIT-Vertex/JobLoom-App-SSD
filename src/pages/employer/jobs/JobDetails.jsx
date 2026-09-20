@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useJobs } from '../../../hooks/useJobs';
 import parse from 'html-react-parser';
+import { sanitizeJobDescription } from '../../../utils/sanitizeJobDescription';
 import { useTranslation } from 'react-i18next';
 
 import DottedBackground from '../../../components/DottedBackground';
@@ -284,7 +285,7 @@ const JobDetails = () => {
           </h2>
           <div className="border-t border-neutral-100 pt-4">
             <div className="prose prose-lg max-w-none text-muted leading-relaxed">
-              {job.description ? parse(job.description) : t('job.no_description')}
+              {parse(sanitizeJobDescription(job.description) || t('job.no_description'))}
             </div>
           </div>
         </div>
