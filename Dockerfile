@@ -27,7 +27,7 @@ RUN npm ci
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN npm run build && node scripts/write-csp-header.mjs /tmp/jobloom-security-headers.conf
 
 # ===================================
 # Stage 2: Production with Nginx
@@ -39,6 +39,8 @@ RUN apk add --no-cache curl
 
 # Copy custom nginx configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+RUN mkdir -p /etc/nginx/snippets
+COPY --from=builder /tmp/jobloom-security-headers.conf /etc/nginx/snippets/jobloom-security-headers.conf
 
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
