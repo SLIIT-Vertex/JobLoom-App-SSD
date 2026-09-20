@@ -13,6 +13,8 @@
     "preview": "vite preview",
     "test": "npx playwright test",
     "test:unit": "vitest run",
+    "test:csp:unit": "node --test security/csp.test.mjs",
+    "test:csp": "playwright test --config security/playwright.config.mjs",
     "test:unit:watch": "vitest",
     "test:e2e": "npx playwright test",
     "test:e2e:interview": "npx playwright test e2e/interview-scheduling.spec.ts --workers=1",

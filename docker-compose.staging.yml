@@ -10,13 +10,14 @@ services:
       target: production
       args:
         - NODE_ENV=staging
+        - VITE_API_URL=${VITE_API_URL:?Set the staging API URL before building}
         - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
         - VITE_JITSI_DOMAIN=${VITE_JITSI_DOMAIN}
     ports:
       - '8081:80'
     environment:
       - NODE_ENV=staging
-      - VITE_API_URL=https://api-staging.jobloom.com
+      - VITE_API_URL=${VITE_API_URL:?Set the staging API URL before building}
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:80/health']
       interval: 30s
