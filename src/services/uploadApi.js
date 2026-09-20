@@ -19,8 +19,15 @@ export async function uploadFile({ file, folder }) {
   const timeoutId = setTimeout(() => controller.abort(), 90000);
 
   try {
+    const token = localStorage.getItem('token');
+    const headers = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_URL}/upload`, {
       method: 'POST',
+      headers,
       body: formData,
       signal: controller.signal,
     });
